@@ -1,0 +1,62 @@
+features I want:
+
+I - functionnal programming
+
+  a) good guard/matching case with wildcard support (_ or otherwise):
+
+    ie:
+    var a = new Whatever;
+    a.matching
+      .case({ 1 => "one" })
+      .case({ 4 => "four" })
+      .case({ _ => "whatever" })
+
+  b) hard but possible: currying and/or partially applied function:
+
+    ie:
+    function addTwo(int) {
+      return int * 2;
+    }
+    var a = addTwo(_);
+    a.toString == "PariallyAppliedFunction(Int) { ... }" // notice the type in the args list
+    a(12); // equals 24
+
+  c) enforce recursivity?
+
+    ie:
+    function fib(n) {
+      return n.matching
+        .case({ 0 => 0 })
+        .case({ 1 => 1 })
+        .case({ _ => this.rec(n - 1) + this.rec(n - 2))
+    }
+
+II - harder but better => work on typeclasses
+
+  a) create generic typeclass with powerfull methods
+
+    ie:
+      function Traversable() {
+        this.each   = { ... }
+        this.map    = { ... }
+        this.inject = { ... }
+      } // and so on...
+
+      function Comparable() {
+        this.eql = { ... }
+        this.lt  = { ... }
+        this.gt  = { ... }
+        this.cmp = { ... } // returns LT, EQ or GT
+      } // and so on...
+
+      // etc...
+
+  b) allow to derivate from them (not a real js-like "inheritance" it just crawls the typeclass methods and add them to the class)
+
+    ie:
+    function Hash() {
+      this.deriving(Traversable, Comparable);
+    }
+    // will allow: (new Hash({ foo: 42, bar: 43 })).each(function(k,v) { console.log(v) });
+
+III - a master object is better so create a meta object "Any" and make everything inherits from it
