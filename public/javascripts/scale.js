@@ -46,23 +46,24 @@ var _ = new __factory__("Wildcard");
   };
 
   __scalable__.is = function() {
-    for(i in arguments)
-      for(j in derivings = this.__derivings__)
-        if(arguments[i].prototype.constructor.__name__ === derivings[j].constructor.__name__) return true;
+    for(i in arguments) for(j in derivings = this.__derivings__)
+      if(arguments[i].prototype.constructor.__name__ === derivings[j].constructor.__name__) return true;
     return false;
+  };
+
+  __scalable__.core = function() {
+    if(this.__object__ !== undefined) return this.__object__;
+    var core = new Object;
+    for(i in this) if(this.hasOwnProperty(i)) core[i] = this[i];
+    return core;
   };
 })(__factory__("Scalable"));
 
 // Traversable
 (function(__traversable__) {
-  __traversable__.core = function() {
-    var core = new Object;
-    for(i in this) if(this.hasOwnProperty(i)) core[i] = (this[i]);
-    return core;
-  };
-
   __traversable__.each = function(block) {
-    for(i in core = this.core()) block.call(this, i, core[i]);
+    var core = this.core();
+    for(i in core) block.call(this, i, core[i]);
   };
 
   __traversable__.size = function() {
@@ -72,24 +73,20 @@ var _ = new __factory__("Wildcard");
   };
 
   __traversable__.first = function() {
-    return this[0];
+    var core = this.core();
+    for(i in core) return core[i];
   };
 
   __traversable__.last = function() {
-    return this[this.size() - 1];
+    var core = this.core(), l;
+    for(i in core) l = core[i];
+    return l;
   };
 })(__factory__("Traversable"));
 
 // Mappable
 
 (function(__mappable__) {
-  // Add recursivity to make a js core object from __object__
-  __mappable__.core = function() {
-    if(this.__object__ !== undefined)
-      return this.__object__;
-    else return this;
-  }
-
   __mappable__.get = function(key) {
     return this.core()[key];
   };
@@ -122,7 +119,7 @@ var _ = new __factory__("Wildcard");
 
 // Caseable
 (function(__caseable__) {
-  // === will be replaced when the Eq typecass shall be created
+  // === will be replaced when the Comparable typecass shall be created
   __caseable__.of = function(obj) {
     for(i in obj)
       if(obj.hasOwnProperty(i) && (i == "_" || i == this)) return obj[i];
