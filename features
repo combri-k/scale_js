@@ -65,3 +65,14 @@ II - harder but better => work on typeclasses
     // will allow: (new Hash({ foo: 42, bar: 43 })).each(function(k,v) { console.log(v) });
 
 III - a master object is better so create a meta object "Any" and make everything inherits from it
+
+IV - map class
+
+  a) allow complex key
+
+    ie:
+    { [1, 2]: "toto" }
+
+  b) separate the elements from the rest of the methods?
+
+  c) add a toObject method that returns the map as a basic javascript object is possible

@@ -20,6 +20,7 @@ Function.prototype.deriving = function() {
   for(i in arguments)
     for(j in proto = arguments[i].prototype)
       this.prototype[j] = proto[j];
+  return this;
 };
 
 // Main varirables
@@ -30,53 +31,66 @@ var _ = __factory__("Wildcard");
 //===============
 
 // Traversable
-(function(t) {
-  t.each = function(block) {
+(function(__traversable__) {
+  __traversable__.each = function(block) {
     for(i in this) if(this.hasOwnProperty(i)) block.call(this, i, this[i]);
   };
 
-  t.size = function() {
+  __traversable__.size = function() {
     var size = 0;
     for(i in this) if(this.hasOwnProperty(i)) ++size;
     return size;
   };
 
-  t.first = function() {
+  __traversable__.first = function() {
     return this[0];
   };
 
-  t.last = function() {
+  __traversable__.last = function() {
     return this[this.size() - 1];
   };
 })(__factory__("Traversable"));
 
 // Mappable
-(function(m) {
-  m.keys = function() {
+(function(__mappable__) {
+  __mappable__.get = function(key) {
+    return this.__values__[key];
+  };
+
+  __mappable__.set = function(key, value) {
+    this.__values__[key] = value;
+    return this;
+  };
+
+  __mappable__.toObject = function() {
+    // Pending
+  };
+
+  __mappable__.keys = function() {
     var keys = new Array;
-    for(i in this) if(this.hasOwnProperty(i)) keys.push(i);
+    for(i in this.__values__) keys.push(i);
     return keys;
   }
 
-  m.firstKey = function() {
+  __mappable__.firstKey = function() {
     return this.keys().first();
   };
 
-  m.values = function() {
+  __mappable__.values = function() {
     var values = new Array;
-    for(i in this) if(this.hasOwnProperty(i)) values.push(this[i]);
+    for(i in values = this.__values__) values.push(values[i]);
     return values;
   }
 
-  m.firstValue = function() {
+  __mappable__.firstValue = function() {
     return this.values().first();
   }
 })(__factory__("Mappable"));
 
 // Caseable
-(function(c) {
+(function(__caseable__) {
   // === will be replaced when the Eq typecass shall be created
-  c.of = function(obj) {
+  __caseable__.of = function(obj) {
     for(i in obj)
       if(obj.hasOwnProperty(i) && (i == "_" || i == this)) return obj[i];
     return false;
@@ -92,17 +106,28 @@ function Map(obj) {
   if(arguments.length != 0 && !(obj instanceof Object) && !(obj instanceof Map))
     throw "Argument must be a Map or an Object";
 
+  this.__values__ = new Object;
   for(i in obj) {
     if(obj[i] instanceof Map || obj[i] instanceof Object)
-      this[i] = new Map(obj[i]);
-    else this[i] = obj[i];
+     this. __values__[i] = new Map(obj[i]);
+    else this.__values__[i] = obj[i];
   }
+  return this;
 };
+
+// Range
+function Range(ary){};
 
 // Set
 function Set(ary){};
 
-// Derivings
+// Rational
+function Rational(){};
+
+//=============
+//= DERIVINGS =
+//=============
+
 Map.deriving    (  Traversable, Mappable  );
 Array.deriving  (  Traversable            );
 String.deriving (  Traversable, Caseable  );
