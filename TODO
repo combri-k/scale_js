@@ -3,9 +3,7 @@ case..of statement improved (replace the basic map)
 
 refactore all backup.js methods for the new system
 
-add derivings method to all object
-
-new typeclasses => Meta and Comparable
+new typeclass => Comparable
 
 finally add require function (?)
 

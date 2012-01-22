@@ -1,39 +1,68 @@
-// must allow this:
-// require("core")
-// require("typeclasses")
-
 //==================
 //= MAIN FUNCTIONS =
 //==================
 
 // Meta functions
 var __factory__ = function(f) {
-  return (parent[f] = function(){}).prototype;
+  factory = parent[f] = function() {};
+  factory.__name__ = f;
+  factory.toString = factory.toLocaleString = function() { return "function() { [scale.js code] }" };
+  return parent[f].prototype;
 };
 
-var __meta__ = function(obj) {
-  return obj["constructor"];
+var __to_array__ = function(args) {
+  return Array.prototype.slice.call(args);
 };
 
 // Main functions
 Function.prototype.deriving = function() {
-  for(i in arguments)
-    for(j in proto = arguments[i].prototype)
-      this.prototype[j] = proto[j];
+  this.prototype.__derivings__ = new Array;
+  for(i in arguments) {
+    this.prototype.__derivings__.push(proto = arguments[i].prototype);
+    for(j in proto) this.prototype[j] = proto[j];
+  }
   return this;
 };
 
-// Main varirables
-var _ = __factory__("Wildcard");
+// Main variables
+var _ = new __factory__("Wildcard");
 
 //===============
 //= TYPECLASSES =
 //===============
 
+// Scalable
+(function(__scalable__) {
+  __scalable__.__send__ = function(){};
+  __scalable__.__try__ = function(){};
+
+  __scalable__.asIn = function(block) {
+    block.call(this, this);
+    return this;
+  };
+
+  __scalable__.isNot = function() {
+    // Pending
+  };
+
+  __scalable__.is = function() {
+    for(i in arguments)
+      for(j in derivings = this.__derivings__)
+        if(arguments[i].prototype.constructor.__name__ === derivings[j].constructor.__name__) return true;
+    return false;
+  };
+})(__factory__("Scalable"));
+
 // Traversable
 (function(__traversable__) {
+  __traversable__.core = function() {
+    var core = new Object;
+    for(i in this) if(this.hasOwnProperty(i)) core[i] = (this[i]);
+    return core;
+  };
+
   __traversable__.each = function(block) {
-    for(i in this) if(this.hasOwnProperty(i)) block.call(this, i, this[i]);
+    for(i in core = this.core()) block.call(this, i, core[i]);
   };
 
   __traversable__.size = function() {
@@ -52,23 +81,27 @@ var _ = __factory__("Wildcard");
 })(__factory__("Traversable"));
 
 // Mappable
+
 (function(__mappable__) {
+  // Add recursivity to make a js core object from __object__
+  __mappable__.core = function() {
+    if(this.__object__ !== undefined)
+      return this.__object__;
+    else return this;
+  }
+
   __mappable__.get = function(key) {
-    return this.__values__[key];
+    return this.core()[key];
   };
 
   __mappable__.set = function(key, value) {
-    this.__values__[key] = value;
+    this.core()[key] = value;
     return this;
-  };
-
-  __mappable__.toObject = function() {
-    // Pending
   };
 
   __mappable__.keys = function() {
     var keys = new Array;
-    for(i in this.__values__) keys.push(i);
+    for(i in this.core()) keys.push(i);
     return keys;
   }
 
@@ -78,7 +111,7 @@ var _ = __factory__("Wildcard");
 
   __mappable__.values = function() {
     var values = new Array;
-    for(i in values = this.__values__) values.push(values[i]);
+    for(i in core = this.core()) values.push(core[i]);
     return values;
   }
 
@@ -102,34 +135,42 @@ var _ = __factory__("Wildcard");
 //===========
 
 // Map
-function Map(obj) {
-  if(arguments.length != 0 && !(obj instanceof Object) && !(obj instanceof Map))
-    throw "Argument must be a Map or an Object";
-
-  this.__values__ = new Object;
+var Map = function(obj) {
+  this.__object__ = new Object;
   for(i in obj) {
     if(obj[i] instanceof Map || obj[i] instanceof Object)
-     this. __values__[i] = new Map(obj[i]);
-    else this.__values__[i] = obj[i];
+      this.__object__[i] = new Map(obj[i]);
+    else this.__object__[i] = obj[i];
   }
-  return this;
 };
 
 // Range
-function Range(ary){};
+function Range(ary){}
 
 // Set
-function Set(ary){};
+function Set(ary){}
 
 // Rational
-function Rational(){};
+function Rational(){}
+
+// Array
+(function(__array__) {
+  __array__.includes = function(obj) {
+    for(i in this) if(this.hasOwnProperty(i) && this[i] === obj) return true;
+    return false;
+  };
+
+  __array__.flatten = function() {
+    // Pending;
+  };
+})(Array.prototype);
 
 //=============
 //= DERIVINGS =
 //=============
 
-Map.deriving    (  Traversable, Mappable  );
-Array.deriving  (  Traversable            );
-String.deriving (  Traversable, Caseable  );
-Set.deriving    (  Traversable            );
-Number.deriving (  Caseable               );
+Map.deriving    (  Scalable, Traversable, Mappable  );
+Array.deriving  (  Scalable, Traversable            );
+String.deriving (  Scalable, Traversable, Caseable  );
+Set.deriving    (  Scalable, Traversable            );
+Number.deriving (  Scalable, Caseable               );
