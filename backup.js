@@ -58,70 +58,6 @@ function Hash(obj) {
 
 // Hash new methods:
 (function(__hash__) {
-  __hash__.length =
-  __hash__.size   = function() {
-    var size = 0;
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        ++size;
-    return size;
-  };
-
-  __hash__.keys = function() {
-    var keys = new Array;
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        keys.push(i);
-    return keys;
-  };
-
-  __hash__.values = function() {
-    var values = new Array;
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        values.push(this[i]);
-    return values;
-   };
-
-  __hash__.include =
-  __hash__.hasKey  =
-  __hash__.member  = function(key) {
-    if(this.hasOwnProperty(key))
-      return true;
-    else return false;
-  };
-
-  __hash__.hasValue = function(value) {
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        if(this[i] === value || (this[i] instanceof Hash && this[i].eql(value)))
-          return true;
-    return false;
-  };
-
-  __hash__.eachPair =
-  __hash__.each     = function(block) {
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        block.call(this, this[i], i);
-  };
-
-  __hash__.map = function(block) {
-    var map = new Array;
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        map.push(block.call(this, this[i], i));
-    return map;
-  };
-
-  __hash__.inject = function(obj, block) {
-    var inject;
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        inject = block.call(this, obj, this[i], i);
-    return inject;
-  };
-
   __hash__.clear = function() {
     for(i in this)
       if(this.hasOwnProperty(i))
@@ -148,18 +84,6 @@ function Hash(obj) {
           delete this[i];
         }
     return removeIf;
-  };
-
-  __hash__.eachKey = function(block) {
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        block.call(this, i);
-  };
-
-  __hash__.eachValue = function(block) {
-    for(i in this)
-      if(this.hasOwnProperty(i))
-        block.call(this, this[i]);
   };
 
   // Other idea: add eql? to all types and call it (if eql? does not exist call == and console.log or sth)
@@ -247,21 +171,6 @@ function Hash(obj) {
     return this.length() === 0;
   };
 
-  __hash__.get   =
-  __hash__.fetch = function(key, handler) {
-    if(this.hasOwnProperty(key)) return this[key];
-    else {
-      if(handler instanceof Function)
-        return handler.call(this, key, this);
-      else return handler;
-    }
-  };
-
-  __hash__.set = function(key, value) {
-    this[key] = value;
-    return this;
-  };
-
   __hash__.rassoc = function(value) {
     var rassoc = this.inject(new Array, function(ary,v,k) {
       if(v === value || (value instanceof Hash && value.eql(v)))
@@ -321,23 +230,6 @@ function Hash(obj) {
     });
   };
 
-  __hash__.tap = function(block) {
-    block.call(this, this);
-    return this;
-  };
-
-  __hash__.__send__ = function(method) {
-    var args = toA(arguments).slice(1);
-    return this.constructor.prototype[method].apply(this, args);
-  };
-
-  __hash__.__try__ = function(method) {
-    try {
-      var args = toA(arguments).slice(1);
-      return this.constructor.prototype[method].apply(this, args);
-    } catch(err) { return null; }
-  };
-
   __hash__.toLocaleString    =
   __hash__.inspect           =
   __hash__.toS               =
@@ -350,20 +242,8 @@ function Hash(obj) {
 
 // Array new methods:
 (function(__array__) {
-  __array__.first = function() {
-    return this[0];
-  };
-
-  __array__.last = function() {
-    return this[this.length - 1];
-  };
-
   __array__.second = function() {
     return this[1];
-  };
-
-  __array__.at = function(index) {
-    return this[index];
   };
 
   __array__.empty = function() {
@@ -470,23 +350,6 @@ function Hash(obj) {
   // In progress
   __array__.flatten = function(level) {
     // return this;
-  };
-
-  __array__.tap = function(block) {
-    block.call(this, this);
-    return this;
-  };
-
-  __array__.__send__ = function(method) {
-    var args = toA(arguments).slice(1);
-    return this.constructor.prototype[method].apply(this, args);
-  };
-
-  __array__.__try__ = function(method) {
-    try {
-      var args = toA(arguments).slice(1);
-      return this.constructor.prototype[method].apply(this, args);
-    } catch(err) { return null; }
   };
 
   __array__.toLocaleString =
@@ -603,23 +466,6 @@ function Hash(obj) {
     return "." + this;
   };
 
-  __string__.tap = function(block) {
-    block.call(this, this);
-    return this;
-  };
-
-  __string__.__send__ = function(method) {
-    var args = toA(arguments).slice(1);
-    return this.constructor.prototype[method].apply(this, args);
-  };
-
-  __string__.__try__ = function(method) {
-    try {
-      var args = toA(arguments).slice(1);
-      return this.constructor.prototype[method].apply(this, args);
-    } catch(err) { return null; }
-  };
-
   __string__.functionalize = function(context) {
     if(context)
       return context[this.toS()];
@@ -668,22 +514,6 @@ function Hash(obj) {
     return this.toI() * 7..days();
   };
 
-  __number__.tap = function(block) {
-    block.call(this, this);
-    return this;
-  };
-
-  __number__.__send__ = function(method) {
-    var args = toA(arguments).slice(1);
-    return this.constructor.prototype[method].apply(this, args);
-  };
-
-  __number__.__try__ = function(method) {
-    try {
-      var args = toA(arguments).slice(1);
-      return this.constructor.prototype[method].apply(this, args);
-    } catch(err) { return null; }
-  };
 })(Number.prototype);
 
 // Math new method:

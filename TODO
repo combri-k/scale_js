@@ -1,11 +1,3 @@
-partially applied functions (and/or curried)
-case..of statement improved (replace the basic map)
-
 refactore all backup.js methods for the new system
-
 new typeclass => Comparable
-
 finally add require function (?)
-
-
-and publish on github

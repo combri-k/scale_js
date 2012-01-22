@@ -4,7 +4,7 @@
 
 // Meta functions
 var __factory__ = function(f) {
-  factory = parent[f] = function() {};
+  var factory = parent[f] = function() {};
   factory.__name__ = f;
   factory.toString = factory.toLocaleString = function() { return "function() { [scale.js code] }" };
   return parent[f].prototype;
@@ -25,7 +25,7 @@ Function.prototype.deriving = function() {
 };
 
 // Main variables
-var _ = new __factory__("Wildcard");
+var _ = new (function() { this.toString = this.toLocaleString = function() { return "_" } });
 
 //===============
 //= TYPECLASSES =
@@ -33,8 +33,17 @@ var _ = new __factory__("Wildcard");
 
 // Scalable
 (function(__scalable__) {
-  __scalable__.__send__ = function(){};
-  __scalable__.__try__ = function(){};
+  __scalable__.__send__ = function() {
+    var args = __to_array__(arguments);
+    return this.constructor.prototype[args[0]].apply(this, args.slice(1));
+  };
+
+  __scalable__.__try__ = function() {
+    try {
+      var args = __to_array__(arguments);
+      return this.constructor.prototype[args[0]].apply(this, args.slice(1));
+    } catch(err) { return null; }
+  };
 
   __scalable__.asIn = function(block) {
     block.call(this, this);
@@ -66,9 +75,24 @@ var _ = new __factory__("Wildcard");
     for(i in core) block.call(this, i, core[i]);
   };
 
+  __traversable__.map = function(block) {
+    var map  = new Array;
+    var core = this.core();
+    for(i in core) map.push(block.call(this, i, core[i]));
+    return map;
+  };
+
+  __traversable__.inject = function(obj, block) {
+    var inject;
+    var core = this.core();
+    for(i in core) inject = block.call(this, obj, i, core[i]);
+    return inject;
+  };
+
   __traversable__.size = function() {
     var size = 0;
-    for(i in this) if(this.hasOwnProperty(i)) ++size;
+    var core = this.core();
+    for(i in core) ++size;
     return size;
   };
 
@@ -82,18 +106,33 @@ var _ = new __factory__("Wildcard");
     for(i in core) l = core[i];
     return l;
   };
+
+  __traversable__.at = function(index) {
+    return this.core()[index];
+  };
 })(__factory__("Traversable"));
 
 // Mappable
-
 (function(__mappable__) {
-  __mappable__.get = function(key) {
-    return this.core()[key];
+  __mappable__.get = function(key, handler) {
+    if(this.core().hasOwnProperty(key)) return this.core()[key];
+
+    if(handler instanceof Function)
+      return handler.call(this, key, this.core());
+    else return handler;
   };
 
   __mappable__.set = function(key, value) {
     this.core()[key] = value;
     return this;
+  };
+
+  __mappable__.eachKey = function(block) {
+    this.keys().each(function(k,v) { block.call(this, v) });
+  };
+
+  __mappable__.eachValue = function(block) {
+    this.values().each(function(k,v) { block.call(this, v) });
   };
 
   __mappable__.keys = function() {
@@ -115,14 +154,24 @@ var _ = new __factory__("Wildcard");
   __mappable__.firstValue = function() {
     return this.values().first();
   }
+
+  __mappable__.hasKey = function(key) {
+    return this.core().hasOwnProperty(key);
+  };
+
+  __mappable__.hasValue = function(value) {
+    return this.values().includes(value);
+  };
+
 })(__factory__("Mappable"));
 
 // Caseable
 (function(__caseable__) {
-  // === will be replaced when the Comparable typecass shall be created
+  // == will be replaced when the Comparable typecass shall be created
   __caseable__.of = function(obj) {
+    var obj = obj.core !== undefined ? obj.core() : obj;
     for(i in obj)
-      if(obj.hasOwnProperty(i) && (i == "_" || i == this)) return obj[i];
+      if(obj.hasOwnProperty(i) && (i == "_" || i.wildcard || i == this)) return obj[i];
     return false;
   };
 })(__factory__("Caseable"));
@@ -142,13 +191,16 @@ var Map = function(obj) {
 };
 
 // Range
-function Range(ary){}
+var Range = function(from, to) {
+  this.from = from;
+  this.to   = to;
+};
 
 // Set
-function Set(ary){}
+var Set = function(ary) {};
 
 // Rational
-function Rational(){}
+var Rational = function(a,b) {};
 
 // Array
 (function(__array__) {
@@ -167,7 +219,7 @@ function Rational(){}
 //=============
 
 Map.deriving    (  Scalable, Traversable, Mappable  );
-Array.deriving  (  Scalable, Traversable            );
+Array.deriving  (  Scalable, Traversable, Caseable  );
 String.deriving (  Scalable, Traversable, Caseable  );
-Set.deriving    (  Scalable, Traversable            );
+Set.deriving    (  Scalable, Traversable, Caseable  );
 Number.deriving (  Scalable, Caseable               );
