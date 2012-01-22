@@ -22,6 +22,9 @@ Function.prototype.deriving = function() {
       this.prototype[j] = proto[j];
 };
 
+// Main varirables
+var _ = __factory__("Wildcard");
+
 //===============
 //= TYPECLASSES =
 //===============
@@ -50,21 +53,33 @@ Function.prototype.deriving = function() {
 // Mappable
 (function(m) {
   m.keys = function() {
-    keys = new Array;
+    var keys = new Array;
     for(i in this) if(this.hasOwnProperty(i)) keys.push(i);
     return keys;
   }
 
+  m.firstKey = function() {
+    return this.keys().first();
+  };
+
   m.values = function() {
-    values = new Array;
+    var values = new Array;
     for(i in this) if(this.hasOwnProperty(i)) values.push(this[i]);
     return values;
+  }
+
+  m.firstValue = function() {
+    return this.values().first();
   }
 })(__factory__("Mappable"));
 
 // Caseable
 (function(c) {
-  c.matching = function() {
+  // === will be replaced when the Eq typecass shall be created
+  c.of = function(obj) {
+    for(i in obj)
+      if(obj.hasOwnProperty(i) && (i == "_" || i == this)) return obj[i];
+    return false;
   };
 })(__factory__("Caseable"));
 
@@ -88,7 +103,8 @@ function Map(obj) {
 function Set(ary){};
 
 // Derivings
-Map.deriving    (  Traversable, Mappable, Caseable  );
-Array.deriving  (  Traversable, Caseable            );
-String.deriving (  Traversable, Caseable            );
-Set.deriving    (  Traversable, Caseable            );
+Map.deriving    (  Traversable, Mappable  );
+Array.deriving  (  Traversable            );
+String.deriving (  Traversable, Caseable  );
+Set.deriving    (  Traversable            );
+Number.deriving (  Caseable               );

@@ -25,10 +25,15 @@ I - functionnal programming
 
     ie:
     function fib(n) {
-      return n.matching
-        .case({ 0 => 0 })
-        .case({ 1 => 1 })
-        .case({ _ => this.rec(n - 1) + this.rec(n - 2))
+      return n.of({
+        0 => 0,
+        1 => 1,
+        _ => this.rec(n - 1) + this.rec(n - 2)
+      });
+      //return n.matching
+      //  .case({ 0 => 0 })
+      //  .case({ 1 => 1 })
+      //  .case({ _ => this.rec(n - 1) + this.rec(n - 2))
     }
 
 II - harder but better => work on typeclasses
