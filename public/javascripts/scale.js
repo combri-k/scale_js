@@ -25,7 +25,7 @@ Function.prototype.deriving = function() {
 };
 
 // Main variables
-var _ = new (function() { this.toString = this.toLocaleString = function() { return "_" } });
+var _ = "_";
 
 //===============
 //= TYPECLASSES =
