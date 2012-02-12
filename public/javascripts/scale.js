@@ -156,7 +156,7 @@ var _ = "_";
   }
 
   __mappable__.hasKey = function(key) {
-    return this.core().hasOwnProperty(key);
+    return this.keys().includes(key);
   };
 
   __mappable__.hasValue = function(value) {
